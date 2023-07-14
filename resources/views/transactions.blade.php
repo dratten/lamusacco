@@ -12,6 +12,7 @@
                             <option value="loan">Loan</option>
                             <option value="deposit">Deposit</option>
                             <option value="withdrawal">Withdrawal</option>
+                            <option value="repayment">Repayment</option>
                         </select>
                         <button type="submit" class="btn btn-primary">Search</button>
                     </div>
@@ -19,12 +20,36 @@
             </div>
             <div class="col-md-6">
                 <div class="float-end">
-                    <button onclick="openPopup('loan')" class="btn btn-success">Loan</button>
-                    <button onclick="openPopup('deposit')" class="btn btn-primary">Deposit</button>
-                    <button onclick="openPopup('withdrawal')" class="btn btn-warning">Withdraw</button>
+                    <button onclick="openPopup('loan')" class="btn btn-success" style="margin-right: 10px">Loan</button>
+                    <button onclick="openPopup('deposit')" class="btn btn-primary" style="margin-right: 10px">Deposit</button>
+                    <button onclick="openPopup('withdrawal')" class="btn btn-warning" style="margin-right: 10px">Withdraw</button>
+                    <button onclick="openPopup('repayment')" class="btn btn-info" style="margin-right: 10px">Repayment</button>
+                    <button class="btn btn-danger" id="send-arrears-reminders-btn">Send Reminders</button>
                 </div>
             </div>
         </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="send-reminders-modal" tabindex="-1" role="dialog" aria-labelledby="send-reminders-modal-label" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="send-reminders-modal-label">Send Loan Due Reminders</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to send loan due reminders?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn cancel-btn btn-danger" data-dismiss="modal">Cancel</button>
+                        <a href="{{ route('send.reminders') }}" class="btn btn-success">Confirm</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         
         <table class="table">
             <thead>
@@ -68,8 +93,6 @@
                                     <option value="{{ $member->id }}" data-member-name="{{ $member->name }}">{{ $member->name }}</option>
                                 @endforeach
                             </select>
-                            <input type="hidden" name="member_id" id="member-id-input">
-                            <input type="hidden" name="member_name" id="member-name-input">
                         </div>
                         <div class="mb-3">
                             <label for="amount" class="form-label">Amount</label>
@@ -108,6 +131,8 @@
                     return 'Deposit';
                 case 'withdrawal':
                     return 'Withdrawal';
+                case 'repayment':
+                    return 'Repayment';
                 default:
                     return 'Transaction';
             }
@@ -116,23 +141,24 @@
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
-        $(document).ready(function () {
-            $('#member-id').select2({
-                placeholder: 'Select a member',
-                allowClear: true,
-                tags: true,
-                minimumInputLength: 1
-            }).on('select2:select', function (e) {
-                var data = e.params.data;
-                $('#member-name-input').val(data.text);
-                $('#member-id-input').val(data.id);
-            }).on('select2:unselect', function () {
-                $('#member-name-input').val('');
-                $('#member-id-input').val('');
+        $(document).ready(function() {
+            $('#send-arrears-reminders-btn').click(function(e) {
+                e.preventDefault();
+                $('#send-reminders-modal').modal('show');
+            });
+
+            $('#send-reminders-modal').on('hidden.bs.modal', function () {
+                // Reset any form values or perform additional actions after modal is closed
+            });
+
+            $('#send-reminders-modal').on('click', '.cancel-btn', function() {
+                $('#send-reminders-modal').modal('hide');
+            });
+
+            $('#send-reminders-modal').on('click', '.close', function() {
+                $('#send-reminders-modal').modal('hide');
             });
         });
-        </script>
-
-
+    </script>
 
 @endsection
