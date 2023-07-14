@@ -48,7 +48,7 @@ class TransactionsController extends Controller
 
         $member = Member::find($transaction->member_id);
         // Retrieve the member and their telephone number
-
+        $phoneNumber = $member->mobile_number;
 
         if ($transaction->type === 'deposit') {
             $member->savings += $transaction->amount;
@@ -68,7 +68,7 @@ class TransactionsController extends Controller
 
         // Send SMS notification
         $message = "Dear {$member->name}, your transaction of {$transaction->type} of {$transaction->amount} has been successfully processed.";
-        $this->sendBulkSMS($member, $message);
+        $this->sendSMS($phoneNumber, $message);
 
         $transaction->save();
         $member->save();
@@ -116,6 +116,20 @@ class TransactionsController extends Controller
 
         $sms->send([
             'to' => $recipients,
+            'message' => $message,
+        ]);
+    }
+
+    private function sendSMS($phoneNumber, $message)
+    {
+        $username = 'sandbox'; // Replace with your Africa's Talking username
+        $apiKey = '2e32e5bb891ae410df9d9891c243c6439acde9589fb2a1f643050e5fbf0c0e47'; // Replace with your Africa's Talking API key
+
+        $AT = new AfricasTalking($username, $apiKey);
+        $sms = $AT->sms();
+
+        $sms->send([
+            'to' => $phoneNumber,
             'message' => $message,
         ]);
     }
